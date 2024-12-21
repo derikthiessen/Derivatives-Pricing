@@ -2,59 +2,53 @@ import yfinance as yf
 import pandas as pd
 
 def main():
-    # Fetch the S&P 500 data from Wikipedia
     url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
     sp500_data = grab_sp500_data_from_wikipedia(url)
     
-    # Drop improper tickers
     drop_improper_tickers(sp500_data)
     
-    # Get list of tickers
     tickers = get_tickers_list(sp500_data)
     
-    # Fetch historical data for all tickers
     tickers_historical_data = fetch_all_tickers_data(tickers)
     
-    # Add descriptive columns to the historical data
     add_descriptive_columns(tickers_historical_data, sp500_data)
     
-    # Print the historical data with added descriptive columns
-    print(tickers_historical_data)
+    output = merge_data_into_one_table(tickers_historical_data)
+
+    dump_data_to_csv(output, r"C:\Users\Derik\OneDrive\Desktop\Coding\Stock-Pricing-Models\data.csv")
 
 def grab_sp500_data_from_wikipedia(url: str) -> pd.DataFrame:
-    # Read S&P 500 data from Wikipedia
+    print('Beginning to get tickers from Wikipedia')
     sp500_table = pd.read_html(url)[0]
-    # Drop unnecessary columns
-    sp500_table.drop(columns = ['Headquarters Location', 'CIK'], inplace=True)
+    sp500_table.drop(columns = ['Headquarters Location', 'CIK'], inplace = True)
+    print('Successfully got tickers from Wikipedia')
     return sp500_table
 
-def drop_improper_tickers(ticker_data: pd.DataFrame, column_name: str = 'Symbol', improper_tickers: list = ['BRK.B', 'BF.B']) -> None:
-    # Drop rows with improper tickers
-    ticker_data.drop(ticker_data[ticker_data[column_name].isin(improper_tickers)].index, inplace=True)
+def drop_improper_tickers(ticker_data: pd.DataFrame, column_name: str = 'Symbol', improper_tickers: list = ['BRK.B', 'BF.B', 'PPG']) -> None:
+    print('Beginning to drop improper tickers')
+    ticker_data.drop(ticker_data[ticker_data[column_name].isin(improper_tickers)].index, inplace = True)
+    print('Successfully dropped improper tickers')
 
 def get_tickers_list(data: pd.DataFrame, column_name: str = 'Symbol') -> list:
-    # Get the list of ticker symbols from the dataframe
     return data[column_name].tolist()
 
 def fetch_ticker_data(ticker_symbol: str, start_date: str) -> pd.DataFrame:
-    # Fetch historical data for a given ticker symbol
+    print(f'Beginning to get yahoo finance historical data for {ticker_symbol}')
     ticker = yf.Ticker(ticker_symbol)
-    return ticker.history(start=start_date)
+    data = ticker.history(start = start_date)
+    print(f'Successfully got yahoo finance historical data for {ticker_symbol}')
+    return data
 
-def fetch_all_tickers_data(ticker_symbols: list, start_date: str = '2024-01-01') -> dict:
-    # Fetch historical data for all tickers in the list
+def fetch_all_tickers_data(ticker_symbols: list, start_date: str = '2024-01-01') -> dict[str, pd.DataFrame]:
     return {ticker_symbol: fetch_ticker_data(ticker_symbol, start_date) for ticker_symbol in ticker_symbols}
 
-def add_descriptive_columns(historical_ticker_data_dictionary: dict, descriptive_data: pd.DataFrame) -> None:
-    # Add descriptive columns from the Wikipedia data to the historical data
+def add_descriptive_columns(historical_ticker_data_dictionary: dict[str, pd.DataFrame], descriptive_data: pd.DataFrame) -> None:
     for index, row in descriptive_data.iterrows():
         ticker = row['Symbol']
         
-        # Ensure the ticker exists in the historical data dictionary
         if ticker in historical_ticker_data_dictionary:
             historical_ticker_data = historical_ticker_data_dictionary[ticker]
             
-            # Add the descriptive columns to the historical data
             historical_ticker_data['Symbol'] = row['Symbol']
             historical_ticker_data['Security'] = row['Security']
             historical_ticker_data['GICS Sector'] = row['GICS Sector']
@@ -62,8 +56,41 @@ def add_descriptive_columns(historical_ticker_data_dictionary: dict, descriptive
             historical_ticker_data['Date Added'] = row['Date added']
             historical_ticker_data['Founded'] = row['Founded']
 
-            # You can also check if the columns already exist and add them conditionally
-            # For example, to avoid overwriting existing columns
+def merge_data_into_one_table(historical_ticker_data_dictionary: pd.DataFrame,
+                              column_names: list[str] = None
+                              ) -> pd.DataFrame:
+    if column_names is None:
+        column_names = [
+            'Symbol',
+            'Security',
+            'GICS Sector',
+            'GICS Sub-Industry',
+            'Date Added',
+            'Founded',
+            'Open',
+            'High',
+            'Low',
+            'Close',
+            'Volume',
+            'Dividends',
+            'Stock Splits'
+        ]
 
-# Run the main function
+    return_df = pd.DataFrame(columns = column_names)
+
+    ticker_dfs = list(historical_ticker_data_dictionary.values())
+    ticker_dfs = [return_df, *ticker_dfs]
+    
+    print('Beginning to merge all tickers\' data into one dataframe')
+    result = pd.concat(ticker_dfs, ignore_index = True)
+    print('Successfully merged all data')
+
+    return result
+
+def dump_data_to_csv(all_data: pd.DataFrame, 
+                     path: str
+                     ) -> None:
+    print('Beginning to dump data to a csv file')
+    all_data.to_csv(path)
+    print('Successfully dumped data to a csv file')
 main()
