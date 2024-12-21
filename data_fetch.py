@@ -15,8 +15,6 @@ def main():
     
     output = merge_data_into_one_table(tickers_historical_data)
 
-    dump_data_to_csv(output, r"C:\Users\Derik\OneDrive\Desktop\Coding\Stock-Pricing-Models\data.csv")
-
 def grab_sp500_data_from_wikipedia(url: str) -> pd.DataFrame:
     print('Beginning to get tickers from Wikipedia')
     sp500_table = pd.read_html(url)[0]
