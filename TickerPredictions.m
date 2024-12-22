@@ -12,7 +12,7 @@ classdef TickerPredictions
         gicsSector string % holds the GICS sector
         gicsSubIndustry string % holds the GICS sub-industry
         dateAdded datetime % holds the date that the security was added to the S&P 500
-        founded double % holds the year that the security was founded
+        yearFounded double % holds the year that the security was founded
 
         % NEED TO DEFINE THE OTHER ATTRIBUTES HERE, WHICH INCLUDE THE 
         % VARIOUS DESCRIPTIVE COLUMNS FOUND IN THE DATA DUMP
@@ -30,6 +30,11 @@ classdef TickerPredictions
             obj.stockData = TickerPredictions.convertDateColumnToDatetime(obj.stockData);
             obj.dataStartDate = obj.getDataStartDate();
             obj.dataEndDate = obj.getDataEndDate();
+            obj.securityName = obj.getSecurityName();
+            obj.gicsSector = obj.getGicsSector();
+            obj.gicsSubIndustry = obj.getGicsSubIndustry();
+            obj.dateAdded = obj.getDateAdded();
+            obj.yearFounded = obj.getYearFounded();
         end
 
         % Grabs the start date of the time series
@@ -40,6 +45,31 @@ classdef TickerPredictions
         % Grabs the end date of the time series
         function endDate = getDataEndDate(obj)
             endDate = obj.stockData.Date(end);
+        end
+
+        % Grabs the security name
+        function securityName = getSecurityName(obj)
+            securityName = obj.stockData.Security(1);
+        end
+
+        % Grabs the GICS Sector
+        function gicsSector = getGicsSector(obj)
+            gicsSector = obj.stockData.GICSSector(1);
+        end
+
+        % Grabs the GICS Sub-Industry
+        function gicsSubIndustry = getGicsSubIndustry(obj)
+            gicsSubIndustry = obj.stockData.GICSSub_Industry(1);
+        end
+
+        % Grabs the date added
+        function dateAdded = getDateAdded(obj)
+            dateAdded = obj.stockData.DateAdded(1);
+        end
+
+        % Grabs the year founded
+        function yearFounded = getYearFounded(obj)
+            yearFounded = obj.stockData.Founded(1);
         end
     end
 
