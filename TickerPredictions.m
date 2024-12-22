@@ -3,10 +3,16 @@ classdef TickerPredictions
     % techniques on one set of time-series data.
 
     properties
+        ticker string % holds the ticker symbol
         stockData table % holds all the data for a particular ticker
         priceValidationTable table % holds the price for each date offset by one day earlier for model comparison
         dataStartDate datetime % holds the start date for the input time series
         dataEndDate datetime % holds the end date for the input time series
+        securityName string % holds the name of the security
+        gicsSector string % holds the GICS sector
+        gicsSubIndustry string % holds the GICS sub-industry
+        dateAdded datetime % holds the date that the security was added to the S&P 500
+        founded double % holds the year that the security was founded
 
         % NEED TO DEFINE THE OTHER ATTRIBUTES HERE, WHICH INCLUDE THE 
         % VARIOUS DESCRIPTIVE COLUMNS FOUND IN THE DATA DUMP
@@ -14,37 +20,16 @@ classdef TickerPredictions
 
     methods
         % Constructor
-        function obj = TickerPredictions(inputData)
+        function obj = TickerPredictions(ticker, inputData)
+            validateattributes(ticker, {'string'}, {})
+            obj.ticker = ticker;
+
             validateattributes(inputData, {'table'}, {});
             obj.stockData = inputData;
 
-            obj.stockData = obj.convertDateColumnToDatetime();
+            obj.stockData = TickerPredictions.convertDateColumnToDatetime(obj.stockData);
             obj.dataStartDate = obj.getDataStartDate();
             obj.dataEndDate = obj.getDataEndDate();
-        end
-        
-        % Converts the date column from cells to a datetime
-        function stockData = convertDateColumnToDatetime(obj)
-            
-            stockData = obj.stockData;
-
-            % Converts the input column from a cell array to a string array
-            if iscell(obj.stockData.Date)
-                stockData.Date = string(obj.stockData.Date);
-            end
-
-            % Checks if the input column 'Date' is a datetime object--if it is not, convert it to one
-            if ~isa(obj.stockData.Date, 'datetime')
-                stockData.Date = datetime(...
-                    stockData.Date, ...
-                    'InputFormat', ...
-                    'yyyy-MM-dd HH:mm:ssXXX', ...
-                    'TimeZone', ...
-                    'UTC');
-                
-                % Removes the timezone from the datetime
-                stockData.Date.TimeZone = '';
-            end
         end
 
         % Grabs the start date of the time series
@@ -55,6 +40,31 @@ classdef TickerPredictions
         % Grabs the end date of the time series
         function endDate = getDataEndDate(obj)
             endDate = obj.stockData.Date(end);
+        end
+    end
+
+    methods(Static)
+
+        % Converts the date column from cells to a datetime
+        function stockData = convertDateColumnToDatetime(stockData)
+
+            % Converts the input column from a cell array to a string array
+            if iscell(stockData.Date)
+                stockData.Date = string(stockData.Date);
+            end
+
+            % Checks if the input column 'Date' is a datetime object--if it is not, convert it to one
+            if ~isa(stockData.Date, 'datetime')
+                stockData.Date = datetime(...
+                    stockData.Date, ...
+                    'InputFormat', ...
+                    'yyyy-MM-dd HH:mm:ssXXX', ...
+                    'TimeZone', ...
+                    'UTC');
+                
+                % Removes the timezone from the datetime
+                stockData.Date.TimeZone = '';
+            end
         end
     end
 end
