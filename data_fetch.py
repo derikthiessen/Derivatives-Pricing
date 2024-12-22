@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 
 def main():
+    
     url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
     sp500_data = grab_sp500_data_from_wikipedia(url)
     
@@ -34,6 +35,7 @@ def fetch_ticker_data(ticker_symbol: str, start_date: str) -> pd.DataFrame:
     print(f'Beginning to get yahoo finance historical data for {ticker_symbol}')
     ticker = yf.Ticker(ticker_symbol)
     data = ticker.history(start = start_date)
+    data.reset_index(inplace = True)
     print(f'Successfully got yahoo finance historical data for {ticker_symbol}')
     return data
 
@@ -59,6 +61,7 @@ def merge_data_into_one_table(historical_ticker_data_dictionary: pd.DataFrame,
                               ) -> pd.DataFrame:
     if column_names is None:
         column_names = [
+            'Date',
             'Symbol',
             'Security',
             'GICS Sector',
