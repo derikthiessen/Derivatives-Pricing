@@ -13,6 +13,7 @@ classdef TickerPredictions
         gicsSubIndustry string % holds the GICS sub-industry
         dateAdded datetime % holds the date that the security was added to the S&P 500
         yearFounded double % holds the year that the security was founded
+        priceValidationColumnNames cell % holds the newly created column names that shift the data backwards
     end
 
     methods
@@ -25,7 +26,9 @@ classdef TickerPredictions
             self.stockData = inputData;
 
             self.stockData = TickerPredictions.convertDateColumnToDatetime(self.stockData);
-            self.stockData = self.shiftClosePriceBack(numPeriodsShifts);
+            [updatedStockData, priceValidationColumnNames] = self.shiftClosePriceBack(numPeriodsShifts);
+            self.stockData = updatedStockData;
+            self.priceValidationColumnNames = priceValidationColumnNames;
             self.numRows = self.getNumRows();
             self.dataStartDate = self.getDataStartDate();
             self.dataEndDate = self.getDataEndDate();
@@ -76,7 +79,7 @@ classdef TickerPredictions
             yearFounded = self.stockData.Founded(1);
         end
 
-        function stockData = shiftClosePriceBack(self, numPeriodsShifts)
+        function [stockData, priceValidationColumnNames] = shiftClosePriceBack(self, numPeriodsShifts)
                 
             % Throw an error if no arguments were given
             if nargin == 0
@@ -96,13 +99,13 @@ classdef TickerPredictions
             stockData = self.stockData;
 
             % Initializes a zeros array to hold the newly created column names
-            priceValidationColumnNames = zeros(1, numel(numPeriodsShifts));
+            priceValidationColumnNames = cell(1, numel(numPeriodsShifts));
 
             % Add each value in numPeriodsShifts as an offset column to the closing price column
             for i = 1:numel(numPeriodsShifts)
                 value = numPeriodsShifts(i);
                 [stockData, newColumnName] = TickerPredictions.addPriceValidationColumn(stockData, value);
-                priceValidationColumnNames(i) = newColumnName;
+                priceValidationColumnNames{i} = string(newColumnName);
             end
         end
         
@@ -184,9 +187,9 @@ classdef TickerPredictions
 
         % Adds a column to stockData which contains the price of the next periodOffset unit of time
         function [stockData, columnName] = addPriceValidationColumn(stockData, periodOffset)
-            columnName = sprintf('Offset_%s', periodOffset);
+            columnName = sprintf('Offset_%d', periodOffset);
             closingPriceValues = stockData.Close;
-            offsetData = [closingPriceValues((periodOffset + 1) : end); NaN(numRowsShift, 1)];
+            offsetData = [closingPriceValues((periodOffset + 1) : end); NaN(periodOffset, 1)];
             stockData.(columnName) = offsetData;
         end
     end
