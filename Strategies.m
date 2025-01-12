@@ -69,7 +69,7 @@ classdef Strategies
             stockData.(newColumnName) = momentumColumn;
         end
         
-        function stockData = addBollingerBands(stockData, columnName, periods, numStdDev, StdDevWindowSize)
+        function stockData = addBollingerBands(stockData, columnName, smaPeriods, numStdDev, StdDevWindowSize)
 
             % Validate inputs
             if nargin < 5
@@ -84,10 +84,10 @@ classdef Strategies
             lowerBand = NaN(height(stockData), 1);
             
             % Calculate the Bollinger Bands
-            for i = periods:height(stockData)
+            for i = smaPeriods:height(stockData)
 
                 % Calculate the SMA
-                sma = mean(dataColumn(i-periods+1:i));
+                sma = mean(dataColumn(i-smaPeriods+1:i));
                 
                 % Calculate the standard deviation over the last 10 periods
                 stdDevWindow = min(StdDevWindowSize, i);
@@ -99,8 +99,8 @@ classdef Strategies
             end
             
             % Add the new columns to the table
-            upperBandColumnName = sprintf('BollingerUpperBand_%d', periods);
-            lowerBandColumnName = sprintf('BollingerLowerBand_%d', periods);
+            upperBandColumnName = sprintf('BollingerUpperBand_%d', smaPeriods);
+            lowerBandColumnName = sprintf('BollingerLowerBand_%d', smaPeriods);
             
             stockData.(upperBandColumnName) = upperBand;
             stockData.(lowerBandColumnName) = lowerBand;
