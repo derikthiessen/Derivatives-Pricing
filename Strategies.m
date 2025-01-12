@@ -32,7 +32,11 @@ classdef Strategies
             % Calculate the weighted moving average
             for i = periods:height(stockData)
                 values = dataColumn(i-periods+1:i); % Get the last 'periods' values
+
+                values = values'; % Transposes the 'values' column vector into a row vector so that the element-wise multiplication results in a row vector
+
                 weightedMovingAverage(i) = sum(values .* weights);
+
             end
             
             % Add the weighted moving average column to the table
