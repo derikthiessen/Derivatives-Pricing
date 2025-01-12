@@ -55,17 +55,18 @@ classdef Strategies
             dataColumn = stockData.(columnName);
             
             % Initialize the momentum column
-            momentumColumn = zeros(height(stockData), 1);
-            
+            momentumColumn = NaN(height(stockData), 1);
+
             % Calculate the momentum
             for i = (periods + 1) : height(stockData) % looping over the entire column to get each momentum value
                 momentumCount = 0;
 
                 for j = (i - periods) : (i - 1) % looping over the 'periods' window for the specific i column
 
-                    if dataColumn(i-j+1) > dataColumn(i-j)
+                    if dataColumn(j + 1) > dataColumn(j)
                         momentumCount = momentumCount + 1;
                     end
+                    
 
                 end
 
