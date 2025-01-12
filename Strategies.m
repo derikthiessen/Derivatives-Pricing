@@ -74,7 +74,7 @@ classdef Strategies
         end
         
         function stockData = addBollingerBands(stockData, columnName, periods, numStdDev, StdDevWindowSize)
-            
+
             % Validate inputs
             if nargin < 5
                 error('You must provide stockData, columnName, periods, numStdDev, and StdDevWindowSize as inputs.');
@@ -108,6 +108,40 @@ classdef Strategies
             
             stockData.(upperBandColumnName) = upperBand;
             stockData.(lowerBandColumnName) = lowerBand;
+        end
+        
+        function stockData = addRSI(stockData, columnName, windowSize)
+            % Validate inputs
+            if nargin < 3
+                error('You must provide stockData, columnName, and windowSize as inputs.');
+            end
+        
+            % Get the data from the specified column
+            dataColumn = stockData.(columnName);
+        
+            % Initialize the new RSI column
+            rsi = NaN(height(stockData), 1);
+        
+            % Calculate the RSI
+            for i = windowSize+1:height(stockData)
+                % Calculate gains and losses
+                gains = max(dataColumn(i-windowSize+1:i) - dataColumn(i-windowSize:i-1), 0);
+                losses = max(dataColumn(i-windowSize:i-1) - dataColumn(i-windowSize+1:i), 0);
+        
+                % Calculate average gains and losses
+                avgGain = mean(gains);
+                avgLoss = mean(losses);
+        
+                % Calculate the Relative Strength (RS)
+                rs = avgGain / avgLoss;
+        
+                % Calculate RSI
+                rsi(i) = 100 - (100 / (1 + rs));
+            end
+        
+            % Add the new RSI column to the table
+            rsiColumnName = sprintf('RSI_%d', windowSize);
+            stockData.(rsiColumnName) = rsi;
         end
         
     end
