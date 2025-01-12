@@ -2,10 +2,6 @@ classdef Strategies
     % Contains all the methods to add each individual prediction strategy to an input dataset
     
     methods(Static)
-        
-        function weightedAverage = calculateWeightedAverage(values, weights)
-            weightedAverage = sum(values .* weights) / sum(weights);
-        end
 
         function stockData = addWeightedMovingAverage(stockData, periods, columnName, weights)
             
