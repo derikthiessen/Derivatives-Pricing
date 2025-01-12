@@ -58,13 +58,17 @@ classdef Strategies
             momentumColumn = zeros(height(stockData), 1);
             
             % Calculate the momentum
-            for i = periods:height(stockData)
+            for i = (periods + 1) : height(stockData) % looping over the entire column to get each momentum value
                 momentumCount = 0;
-                for j = 1:periods
+
+                for j = (i - periods) : (i - 1) % looping over the 'periods' window for the specific i column
+
                     if dataColumn(i-j+1) > dataColumn(i-j)
                         momentumCount = momentumCount + 1;
                     end
+
                 end
+                
                 momentumColumn(i) = momentumCount;
             end
             
