@@ -40,7 +40,7 @@ classdef Strategies
             end
             
             % Add the weighted moving average column to the table
-            newColumnName = sprintf('%d_WeightedMovingAverage', periods);
+            newColumnName = sprintf('WeightedMovingAverage_%d_Periods', periods);
 
             stockData.(newColumnName) = weightedMovingAverage;
         end
@@ -68,12 +68,12 @@ classdef Strategies
                     end
 
                 end
-                
+
                 momentumColumn(i) = momentumCount;
             end
             
             % Add the momentum column to the table
-            newColumnName = sprintf('%d_Momentum', periods);
+            newColumnName = sprintf('Momentum_%d_Periods', periods);
             stockData.(newColumnName) = momentumColumn;
         end
         
@@ -107,8 +107,8 @@ classdef Strategies
             end
             
             % Add the new columns to the table
-            upperBandColumnName = sprintf('BollingerUpperBand_%d', smaPeriods);
-            lowerBandColumnName = sprintf('BollingerLowerBand_%d', smaPeriods);
+            upperBandColumnName = sprintf('BollingerUpperBand_%d_SMA_Periods', smaPeriods);
+            lowerBandColumnName = sprintf('BollingerLowerBand_%d_SMA_Periods', smaPeriods);
             
             stockData.(upperBandColumnName) = upperBand;
             stockData.(lowerBandColumnName) = lowerBand;
@@ -144,7 +144,7 @@ classdef Strategies
             end
         
             % Add the new RSI column to the table
-            rsiColumnName = sprintf('RSI_%d', windowSize);
+            rsiColumnName = sprintf('RSI_%d_AvgWindowSize', windowSize);
             stockData.(rsiColumnName) = rsi;
         end
         
