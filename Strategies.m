@@ -73,10 +73,11 @@ classdef Strategies
             stockData.(newColumnName) = momentumColumn;
         end
         
-        function stockData = addBollingerBands(stockData, columnName, periods, numStdDev)
+        function stockData = addBollingerBands(stockData, columnName, periods, numStdDev, StdDevWindowSize)
+            
             % Validate inputs
-            if nargin < 4
-                error('You must provide stockData, columnName, periods, and numStdDev as inputs.');
+            if nargin < 5
+                error('You must provide stockData, columnName, periods, numStdDev, and StdDevWindowSize as inputs.');
             end
         
             % Get the data from the specified column
@@ -88,11 +89,12 @@ classdef Strategies
             
             % Calculate the Bollinger Bands
             for i = periods:height(stockData)
+
                 % Calculate the SMA
                 sma = mean(dataColumn(i-periods+1:i));
                 
                 % Calculate the standard deviation over the last 10 periods
-                stdDevWindow = min(10, i);
+                stdDevWindow = min(StdDevWindowSize, i);
                 stdDev = std(dataColumn(i-stdDevWindow+1:i));
                 
                 % Calculate the bands
