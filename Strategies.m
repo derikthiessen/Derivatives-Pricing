@@ -9,7 +9,6 @@ classdef Strategies
 
         function stockData = addWeightedMovingAverage(stockData, periods, columnName, weights)
             
-            % Validate input arguments
             if nargin < 4
 
                 % If weights are not provided, default to equal weights
@@ -41,9 +40,37 @@ classdef Strategies
             end
             
             % Add the weighted moving average column to the table
-            newColumnName = [columnName '_WeightedMovingAvg'];
-            
+            newColumnName = sprintf('%d_WeightedMovingAverage', periods);
+
             stockData.(newColumnName) = weightedMovingAverage;
+        end
+        
+        function stockData = addMomentum(stockData, periods, columnName)
+            
+            if nargin < 3
+                error('You must provide stockData, periods, and columnName as inputs.');
+            end
+        
+            % Get the data from the specified column
+            dataColumn = stockData.(columnName);
+            
+            % Initialize the momentum column
+            momentumColumn = zeros(height(stockData), 1);
+            
+            % Calculate the momentum
+            for i = periods:height(stockData)
+                momentumCount = 0;
+                for j = 1:periods
+                    if dataColumn(i-j+1) > dataColumn(i-j)
+                        momentumCount = momentumCount + 1;
+                    end
+                end
+                momentumColumn(i) = momentumCount;
+            end
+            
+            % Add the momentum column to the table
+            newColumnName = sprintf('%d_Momentum', periods);
+            stockData.(newColumnName) = momentumColumn;
         end
         
     end
