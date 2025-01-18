@@ -149,7 +149,7 @@ classdef Strategies
             stockData.(rsiColumnName) = rsi;
         end
 
-        function stockData = addBuySellSignal(stockData, momentumColumnName, buyThreshold)
+        function stockData = addMomentumBuySellSignal(stockData, momentumColumnName, buyThreshold)
             
             % Initialize the BuySellSignal column with "Sell" by default
             buySellSignal = repmat("Sell", height(stockData), 1);
