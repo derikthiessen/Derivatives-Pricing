@@ -148,6 +148,19 @@ classdef Strategies
             rsiColumnName = sprintf('RSI%dAvgWindowSize', windowSize);
             stockData.(rsiColumnName) = rsi;
         end
+
+        function stockData = addBuySellSignal(stockData, momentumColumnName, buyThreshold)
+            
+            % Initialize the BuySellSignal column with "Sell" by default
+            buySellSignal = repmat("Sell", height(stockData), 1);
+            
+            % Find the indices where the momentum value meets or exceeds the buyThreshold
+            buyIndices = stockData.(momentumColumnName) >= buyThreshold;
+            
+            buySellSignal(buyIndices) = "Buy";
+            
+            stockData.BuySellSignal = buySellSignal;
+        end
         
     end
 end
