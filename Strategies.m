@@ -3,7 +3,7 @@ classdef Strategies
     
     methods(Static)
 
-        function stockData = addWeightedMovingAverage(stockData, periods, columnName, weights)
+        function [stockData, newColumnName] = addWeightedMovingAverage(stockData, periods, columnName, weights)
             
             if nargin < 4
 
@@ -45,7 +45,7 @@ classdef Strategies
             stockData.(newColumnName) = weightedMovingAverage;
         end
         
-        function stockData = addMomentum(stockData, periods, columnName)
+        function [stockData, newColumnName] = addMomentum(stockData, periods, columnName)
             
             if nargin < 3
                 error('You must provide stockData, periods, and columnName as inputs.');
@@ -78,7 +78,7 @@ classdef Strategies
             stockData.(newColumnName) = momentumColumn;
         end
         
-        function stockData = addBollingerBands(stockData, columnName, smaPeriods, numStdDev, StdDevWindowSize)
+        function [stockData, upperBandColumnName, lowerBandColumnName] = addBollingerBands(stockData, columnName, smaPeriods, numStdDev, StdDevWindowSize)
 
             % Validate inputs
             if nargin < 5
@@ -115,7 +115,7 @@ classdef Strategies
             stockData.(lowerBandColumnName) = lowerBand;
         end
         
-        function stockData = addRSI(stockData, columnName, windowSize)
+        function [stockData, newColumnName] = addRSI(stockData, columnName, windowSize)
             % Validate inputs
             if nargin < 3
                 error('You must provide stockData, columnName, and windowSize as inputs.');
@@ -145,11 +145,11 @@ classdef Strategies
             end
         
             % Add the new RSI column to the table
-            rsiColumnName = sprintf('RSI%dAvgWindowSize', windowSize);
-            stockData.(rsiColumnName) = rsi;
+            newColumnName = sprintf('RSI%dAvgWindowSize', windowSize);
+            stockData.(newColumnName) = rsi;
         end
 
-        function stockData = addMomentumBuySellSignal(stockData, momentumColumnName, buyThreshold)
+        function [stockData, newColumnName] = addMomentumBuySellSignal(stockData, momentumColumnName, buyThreshold)
             
             % Initialize the BuySellSignal column with "Sell" by default
             buySellSignal = repmat("Sell", height(stockData), 1);
@@ -159,7 +159,10 @@ classdef Strategies
             
             buySellSignal(buyIndices) = "Buy";
             
-            stockData.BuySellSignal = buySellSignal;
+            % Determine the new columnName
+            newColumnName = momentumColumnName + "BuySellSignal";
+
+            stockData.newColumnName = buySellSignal;
         end
         
     end
