@@ -3,7 +3,7 @@ classdef Plotting
 
     methods(Static)
 
-        function plotTableLines(inputTable, xColumnName, lineColumnNames)
+        function plotTableLines(inputTable, xColumnName, lineColumnNames, chartTitle)
         
             xData = inputTable.(xColumnName);
             
@@ -26,8 +26,8 @@ classdef Plotting
             
             % Add labels, title, and legend
             xlabel(xColumnName)
-            ylabel('Values')
-            title('Line Chart from Table')
+            ylabel('Price')
+            title(chartTitle)
             legend show % Display the legend
             grid on
         end
