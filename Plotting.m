@@ -29,7 +29,7 @@ classdef Plotting
             title(chartTitle)
             legend show 
             grid on
-            
+
         end
 
         function plotPredictionAccuracyChart(stockData, strategyColumnNames, priceValidationColumnNames, chartTitle)
@@ -50,7 +50,7 @@ classdef Plotting
             
             % Loop over all combinations of strategy columns and price validation columns to calculate prediction accuracy
             for i = 1 : numStrategies
-                for j = 1:numPriceValidations
+                for j = 1 : numPriceValidations
                     strategyColumn = stockData.(strategyColumnNames{i});
                     priceValidationColumn = stockData.(priceValidationColumnNames{j});
                     closePrice = stockData.Close;
@@ -67,7 +67,6 @@ classdef Plotting
                 end
             end
             
-            % Reshape and plot bar chart
             hitRates = hitRates(:);
             barTitles = barTitles(:);
             
