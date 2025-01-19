@@ -162,7 +162,7 @@ classdef Strategies
             % Determine the new columnName
             newColumnName = momentumColumnName + "BuySellSignal";
 
-            stockData.newColumnName = buySellSignal;
+            stockData.(newColumnName) = buySellSignal;
         end
 
         function [stockData, newColumnName] = addRSIBuySellSignal(stockData, RSIColumnName, buyThreshold)
@@ -178,7 +178,7 @@ classdef Strategies
             % Determine the new column name
             newColumnName = RSIColumnName + "BuySellSignal";
 
-            stockData.newColumnName = buySellSignal;
+            stockData.(newColumnName) = buySellSignal;
         
         end
         
