@@ -6,10 +6,10 @@ classdef StrategyBuilder
 
     methods(Static)
 
-        function stockData = determineBuySignal(stockData, priceColumn, strategyConditions, logicalOperator, outputColumnTitle)
-            % Validate logicalOperator
+        function stockData = buildCombinedStrategy(stockData, priceColumn, strategyConditions, logicalOperator, outputColumnTitle)
+            
             if ~ismember(logicalOperator, ["and", "or"])
-                error('logicalOperator must be "and" or "or".');
+                error('Input for logicalOperator must be "and" or "or".');
             end
             
             % Initialize the decision column with NaN values
