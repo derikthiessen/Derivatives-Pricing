@@ -171,7 +171,7 @@ classdef Strategies
             buySellSignal = repmat("Sell", height(stockData), 1);
 
             % Find the indices where the momentum value meets or exceeds the buyThreshold
-            buyIndices = stockData.(momentumColumnName) >= buyThreshold;
+            buyIndices = stockData.(RSIColumnName) >= buyThreshold;
 
             buySellSignal(buyIndices) = "Buy";
 
