@@ -31,23 +31,27 @@ classdef Plotting
             grid on
         end
 
-        function plotHitRateBarChart(stockData, buyColumnName, priceValidationColumnName, chartTitle)
+        function plotPredictionAccuracyChart(stockData, actionColumnName, priceValidationColumnName, chartTitle)
             
             closePrice = stockData.Close;
             
-            buyColumn = stockData.(buyColumnName);
+            actionColumn = stockData.(actionColumnName);
             priceValidationColumn = stockData.(priceValidationColumnName);
             
-            hits = (buyColumn == 1) & (priceValidationColumn > closePrice);
-            totalValidBuys = sum(~isnan(buyColumn));
+            hits = ((actionColumn == 1) & (priceValidationColumn > closePrice)) | ...
+                   ((actionColumn == 0) & (priceValidationColumn < closePrice));
             
-            hitRate = sum(hits) / totalValidBuys;
-
-            figure;
+            validIndices = ~isnan(actionColumn) & ~isnan(priceValidationColumn) & ~isnan(closePrice);
+            totalValid = sum(validIndices);
+            totalHits = sum(hits(validIndices));
+            
+            hitRate = totalHits / totalValid;
+            
             bar(hitRate);
             title(chartTitle);
-            ylabel('Hit Rate');
-            xticklabels({buyColumnName});
+            ylabel('Accuracy');
+            xticks(1);
+            xticklabels({actionColumnName});
             ylim([0 1]);
             grid on;
 
