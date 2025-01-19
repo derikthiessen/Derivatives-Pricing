@@ -29,29 +29,54 @@ classdef Plotting
             title(chartTitle)
             legend show 
             grid on
+            
         end
 
-        function plotPredictionAccuracyChart(stockData, actionColumnName, priceValidationColumnName, chartTitle)
+        function plotPredictionAccuracyChart(stockData, strategyColumnNames, priceValidationColumnNames, chartTitle)
             
-            closePrice = stockData.Close;
+            % Ensure inputs are cell arrays
+            if ischar(strategyColumnNames)
+                strategyColumnNames = {strategyColumnNames};
+            end
+            if ischar(priceValidationColumnNames)
+                priceValidationColumnNames = {priceValidationColumnNames};
+            end
             
-            actionColumn = stockData.(actionColumnName);
-            priceValidationColumn = stockData.(priceValidationColumnName);
+            % Initialize results array
+            numStrategies = length(strategyColumnNames);
+            numPriceValidations = length(priceValidationColumnNames);
+            hitRates = zeros(numStrategies, numPriceValidations);
+            barTitles = strings(numStrategies, numPriceValidations);
             
-            hits = ((actionColumn == 1) & (priceValidationColumn > closePrice)) | ...
-                   ((actionColumn == 0) & (priceValidationColumn < closePrice));
+            % Loop over all combinations of strategy columns and price validation columns to calculate prediction accuracy
+            for i = 1 : numStrategies
+                for j = 1:numPriceValidations
+                    strategyColumn = stockData.(strategyColumnNames{i});
+                    priceValidationColumn = stockData.(priceValidationColumnNames{j});
+                    closePrice = stockData.Close;
+                    
+                    hits = ((strategyColumn == 1) & (priceValidationColumn > closePrice)) | ...
+                           ((strategyColumn == 0) & (priceValidationColumn < closePrice));
+                    
+                    validIndices = ~isnan(strategyColumn) & ~isnan(priceValidationColumn) & ~isnan(closePrice);
+                    totalValid = sum(validIndices);
+                    totalHits = sum(hits(validIndices));
+                    
+                    hitRates(i, j) = totalHits / totalValid;
+                    barTitles(i, j) = strategyColumnNames{i} + " & " + priceValidationColumnNames{j};
+                end
+            end
             
-            validIndices = ~isnan(actionColumn) & ~isnan(priceValidationColumn) & ~isnan(closePrice);
-            totalValid = sum(validIndices);
-            totalHits = sum(hits(validIndices));
+            % Reshape and plot bar chart
+            hitRates = hitRates(:);
+            barTitles = barTitles(:);
             
-            hitRate = totalHits / totalValid;
-            
-            bar(hitRate);
+            bar(hitRates);
             title(chartTitle);
             ylabel('Accuracy');
-            xticks(1);
-            xticklabels({actionColumnName});
+            xticks(1:length(barTitles));
+            xticklabels(barTitles);
+            xtickangle(45);
             ylim([0 1]);
             grid on;
 
