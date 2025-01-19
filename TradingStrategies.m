@@ -154,7 +154,7 @@ classdef TradingStrategies
         function [stockData, newColumnName] = addMomentumBuySellSignal(stockData, momentumColumnName, buyThreshold)
             
             % Initialize the BuySellSignal column with "Sell" by default
-            buySellSignal = repmat("Sell", height(stockData), 1);
+            buySellSignal = NaN(height(stockData), 1);
             
             % Find the indices where the momentum value meets or exceeds the buyThreshold
             buyIndices = stockData.(momentumColumnName) >= buyThreshold;
