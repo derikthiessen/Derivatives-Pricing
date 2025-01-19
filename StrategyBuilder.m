@@ -75,7 +75,7 @@ classdef StrategyBuilder
             
             % Apply NaN logic
             nanRows = any(ismissing(stockData(:, [priceColumn, keys(strategyConditions)])), 2);
-            stockData.(outputColumnTitle) = finalDecision;
+            stockData.(outputColumnTitle) = double(finalDecision);
             stockData.(outputColumnTitle)(nanRows) = NaN;
         end
 
