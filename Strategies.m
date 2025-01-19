@@ -164,6 +164,23 @@ classdef Strategies
 
             stockData.newColumnName = buySellSignal;
         end
+
+        function [stockData, newColumnName] = addRSIBuySellSignal(stockData, RSIColumnName, buyThreshold)
+            
+            % Initialize the BuySellSignal column with "Sell" by default
+            buySellSignal = repmat("Sell", height(stockData), 1);
+
+            % Find the indices where the momentum value meets or exceeds the buyThreshold
+            buyIndices = stockData.(momentumColumnName) >= buyThreshold;
+
+            buySellSignal(buyIndices) = "Buy";
+
+            % Determine the new column name
+            newColumnName = RSIColumnName + "BuySellSignal";
+
+            stockData.newColumnName = buySellSignal;
+        
+        end
         
     end
 end
