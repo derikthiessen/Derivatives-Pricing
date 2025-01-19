@@ -7,7 +7,7 @@ classdef StrategyBuilder
     methods(Static)
 
         function stockData = buildCombinedStrategy(stockData, priceColumn, strategyConditions, logicalOperator, outputColumnTitle)
-            
+    
             if ~ismember(logicalOperator, ["and", "or"])
                 error('Input for logicalOperator must be "and" or "or".');
             end
@@ -30,39 +30,26 @@ classdef StrategyBuilder
                 if isKey(strategyMap, columnNameStr)
                     switch strategyMap(columnNameStr)
                         case 'MovingAverage'
-                            if isnumeric(conditionValue)
-                                conditionResults(:, colIndex) = abs(stockData.(columnNameStr) - stockData.(priceColumn)) ./ stockData.(priceColumn) >= conditionValue;
-                            elseif ismember(conditionValue, {'over', 'under'})
-                                if conditionValue == "over"
-                                    conditionResults(:, colIndex) = stockData.(columnNameStr) > stockData.(priceColumn);
-                                else
-                                    conditionResults(:, colIndex) = stockData.(columnNameStr) < stockData.(priceColumn);
-                                end
-                            else
-                                error('Invalid condition for MovingAverage. Use "over", "under", or a numeric value.');
-                            end
+                            conditionResults(:, colIndex) = StrategyBuilder.checkMovingAverageOrBollinger(stockData, priceColumn, columnNameStr, conditionValue);
+                            
                         case 'Momentum'
                             conditionResults(:, colIndex) = stockData.(columnNameStr) >= conditionValue;
+                            
                         case 'Bollinger'
-                            if isnumeric(conditionValue)
-                                conditionResults(:, colIndex) = abs(stockData.(columnNameStr) - stockData.(priceColumn)) ./ stockData.(priceColumn) >= conditionValue;
-                            elseif ismember(conditionValue, {'over', 'under'})
-                                if conditionValue == "over"
-                                    conditionResults(:, colIndex) = stockData.(columnNameStr) > stockData.(priceColumn);
-                                else
-                                    conditionResults(:, colIndex) = stockData.(columnNameStr) < stockData.(priceColumn);
-                                end
-                            else
-                                error('Invalid condition for Bollinger. Use "over", "under", or a numeric value.');
-                            end
+                            conditionResults(:, colIndex) = StrategyBuilder.checkMovingAverageOrBollinger(stockData, priceColumn, columnNameStr, conditionValue);
+                            
                         case 'RSI'
                             conditionResults(:, colIndex) = stockData.(columnNameStr) >= conditionValue;
+                            
                         otherwise
                             error('Unknown strategy type.');
                     end
+
                     colIndex = colIndex + 1;
+
                 else
                     error(['Column ', columnNameStr, ' not found or does not match any strategy types.']);
+
                 end
             end
             
@@ -78,6 +65,32 @@ classdef StrategyBuilder
             stockData.(outputColumnTitle) = double(finalDecision);
             stockData.(outputColumnTitle)(nanRows) = NaN;
         end
+        
+        function result = checkMovingAverageOrBollinger(stockData, priceColumn, columnNameStr, conditionValue)
+            if iscell(conditionValue) && numel(conditionValue) == 2
+                direction = conditionValue{1};
+                percentage = conditionValue{2};
+                
+                if ismember(direction, {'over', 'under'}) && isnumeric(percentage)
+                    deviation = abs(stockData.(columnNameStr) - stockData.(priceColumn)) ./ stockData.(priceColumn);
+                    if direction == "over"
+                        result = (stockData.(columnNameStr) > stockData.(priceColumn)) & (deviation >= percentage);
+                    else
+                        result = (stockData.(columnNameStr) < stockData.(priceColumn)) & (deviation >= percentage);
+                    end
+                else
+                    error('For MovingAverage and Bollinger, provide a direction ("over"/"under") and a numeric percentage.');
+                end
+            elseif ismember(conditionValue, {'over', 'under'})
+                if conditionValue == "over"
+                    result = stockData.(columnNameStr) > stockData.(priceColumn);
+                else
+                    result = stockData.(columnNameStr) < stockData.(priceColumn);
+                end
+            else
+                error('Invalid condition format for MovingAverage or Bollinger.');
+            end
+        end        
 
         function strategyMap = mapColumnNamesToStrategies(strategyConditions)
 
