@@ -16,66 +16,54 @@ classdef StrategyBuilder
             stockData.(outputColumnTitle) = NaN(height(stockData), 1);
             
             % Map of strategy types to key phrases
-            strategyMap = containers.Map('KeyType', 'char', 'ValueType', 'any');
-            for columnName = fieldnames(stockData)'
-                colNameStr = columnName{1};
-                if contains(lower(colNameStr), 'rsi')
-                    strategyMap(colNameStr) = 'RSI';
-                elseif contains(lower(colNameStr), 'momentum')
-                    strategyMap(colNameStr) = 'Momentum';
-                elseif contains(lower(colNameStr), 'bollinger')
-                    strategyMap(colNameStr) = 'Bollinger';
-                elseif contains(lower(colNameStr), 'movingaverage')
-                    strategyMap(colNameStr) = 'MovingAverage';
-                end
-            end
+            strategyMap = StrategyBuilder.mapColumnNamesToStrategies(strategyConditions);
             
             % Process conditions and apply logic
             conditionResults = false(height(stockData), length(strategyConditions));
             colIndex = 1;
             
             for columnName = keys(strategyConditions)
-                colNameStr = columnName{1};
-                conditionValue = strategyConditions(colNameStr);
+                columnNameStr = columnName{1};
+                conditionValue = strategyConditions(columnNameStr);
                 
                 % Check if the column name is valid and present in strategyMap
-                if isKey(strategyMap, colNameStr)
-                    switch strategyMap(colNameStr)
+                if isKey(strategyMap, columnNameStr)
+                    switch strategyMap(columnNameStr)
                         case 'MovingAverage'
                             if isnumeric(conditionValue)
-                                conditionResults(:, colIndex) = abs(stockData.(colNameStr) - stockData.(priceColumn)) / stockData.(priceColumn) >= conditionValue;
+                                conditionResults(:, colIndex) = abs(stockData.(columnNameStr) - stockData.(priceColumn)) / stockData.(priceColumn) >= conditionValue;
                             elseif ismember(conditionValue, {'over', 'under'})
                                 if conditionValue == "over"
-                                    conditionResults(:, colIndex) = stockData.(colNameStr) > stockData.(priceColumn);
+                                    conditionResults(:, colIndex) = stockData.(columnNameStr) > stockData.(priceColumn);
                                 else
-                                    conditionResults(:, colIndex) = stockData.(colNameStr) < stockData.(priceColumn);
+                                    conditionResults(:, colIndex) = stockData.(columnNameStr) < stockData.(priceColumn);
                                 end
                             else
                                 error('Invalid condition for MovingAverage. Use "over", "under", or a numeric value.');
                             end
                         case 'Momentum'
-                            conditionResults(:, colIndex) = stockData.(colNameStr) >= conditionValue;
+                            conditionResults(:, colIndex) = stockData.(columnNameStr) >= conditionValue;
                         case 'Bollinger'
                             % Similar logic to MovingAverage
                             if isnumeric(conditionValue)
-                                conditionResults(:, colIndex) = abs(stockData.(colNameStr) - stockData.(priceColumn)) / stockData.(priceColumn) >= conditionValue;
+                                conditionResults(:, colIndex) = abs(stockData.(columnNameStr) - stockData.(priceColumn)) / stockData.(priceColumn) >= conditionValue;
                             elseif ismember(conditionValue, {'over', 'under'})
                                 if conditionValue == "over"
-                                    conditionResults(:, colIndex) = stockData.(colNameStr) > stockData.(priceColumn);
+                                    conditionResults(:, colIndex) = stockData.(columnNameStr) > stockData.(priceColumn);
                                 else
-                                    conditionResults(:, colIndex) = stockData.(colNameStr) < stockData.(priceColumn);
+                                    conditionResults(:, colIndex) = stockData.(columnNameStr) < stockData.(priceColumn);
                                 end
                             else
                                 error('Invalid condition for Bollinger. Use "over", "under", or a numeric value.');
                             end
                         case 'RSI'
-                            conditionResults(:, colIndex) = stockData.(colNameStr) >= conditionValue;
+                            conditionResults(:, colIndex) = stockData.(columnNameStr) >= conditionValue;
                         otherwise
                             error('Unknown strategy type.');
                     end
                     colIndex = colIndex + 1;
                 else
-                    error(['Column ', colNameStr, ' not found or does not match any strategy types.']);
+                    error(['Column ', columnNameStr, ' not found or does not match any strategy types.']);
                 end
             end
             
@@ -90,6 +78,39 @@ classdef StrategyBuilder
             nanRows = any(ismissing(stockData(:, [priceColumn, keys(strategyConditions)])), 2);
             stockData.(outputColumnTitle) = finalDecision;
             stockData.(outputColumnTitle)(nanRows) = NaN;
+        end
+
+        function strategyMap = mapColumnNamesToStrategies(strategyConditions)
+
+            strategyMap = containers.Map('KeyType', 'char', 'ValueType', 'any');
+
+            for columnName = keys(strategyConditions)
+                columnNameStr = columnName{1};
+                lowerColumnNameStr = lower(columnNameStr);
+
+                if contains(lowerColumnNameStr, 'rsi')
+                    strategyMap(columnNameStr) = 'RSI';
+
+                elseif contains(lowerColumnNameStr, 'momentum')
+                    strategyMap(columnNameStr) = 'Momentum';
+
+                elseif contains(lowerColumnNameStr, 'bollinger')
+                    strategyMap(columnNameStr) = 'Bollinger';
+
+                elseif contains(lowerColumnNameStrm, 'movingaverage')
+                    strategyMap(columnNameStr) = 'MovingAverage';
+                
+                else
+                    errorString = sprintf(...
+                        'The input column %s does not match any known strategy types. ', ...
+                        'Please edit the column name to match one of the expected types (RSI, Momentum, Bollinger, MovingAverage), ', ...
+                        'or add the strategy type to the if block in this function and the TradingStrategies class.', ...
+                        columnNameStr);
+
+                    error('MATLAB:InvalidValue', errorString);
+
+                end
+            end
         end
     end
 end
