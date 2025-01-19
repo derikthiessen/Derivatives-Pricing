@@ -7,7 +7,7 @@ classdef Plotting
 
     methods(Static)
 
-        function plotStrategyPredictionLines(stockData, xColumnName, lineColumnNames, chartTitle)
+        function plotStrategyPredictionLines(stockData, xColumnName, lineColumnNames, yAxisTitle, chartTitle)
         
             xData = stockData.(xColumnName);
             
@@ -29,7 +29,7 @@ classdef Plotting
             hold off
             
             xlabel(xColumnName)
-            ylabel('Price')
+            ylabel(yAxisTitle)
             title(chartTitle)
             legend show 
             grid on
@@ -91,7 +91,7 @@ classdef Plotting
             if ischar(strategyColumnNames)
                 strategyColumnNames = {strategyColumnNames};
             end
-            
+
             if ischar(priceValidationColumnNames)
                 priceValidationColumnNames = {priceValidationColumnNames};
             end
