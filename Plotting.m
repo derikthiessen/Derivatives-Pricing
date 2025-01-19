@@ -1,9 +1,13 @@
 classdef Plotting
-    % Class holding all the methods for plotting showing plots of certain strategies
+    % Class holding all the methods for plotting 
+    % Options include plotting: 
+    %   a line chart of one or more strategies' outputs (plotStrategyPredictionLines),
+    %   a bar chart of one or more strategies' prediction accuracy (plotPredictionAccuracyBars),
+    %   a line chart of one or more strategies' cumulative value added compared to the price it is tracking (plotCumulativeValueAdded) 
 
     methods(Static)
 
-        function plotTableLines(inputTable, xColumnName, lineColumnNames, chartTitle)
+        function plotStrategyPredictionLines(inputTable, xColumnName, lineColumnNames, chartTitle)
         
             xData = inputTable.(xColumnName);
             
@@ -32,7 +36,7 @@ classdef Plotting
 
         end
 
-        function plotPredictionAccuracyChart(stockData, strategyColumnNames, priceValidationColumnNames, chartTitle)
+        function plotPredictionAccuracyBars(stockData, strategyColumnNames, priceValidationColumnNames, chartTitle)
             
             % Ensure inputs are cell arrays
             if ischar(strategyColumnNames)
