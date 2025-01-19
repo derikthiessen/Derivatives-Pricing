@@ -158,10 +158,13 @@ classdef TradingStrategies
             
             % Find the indices where the momentum value meets or exceeds the buyThreshold
             buyIndices = stockData.(momentumColumnName) >= buyThreshold;
+
+            % Find the indices where the momentum value falls below the buyThreshold
+            sellIndices = stockData.(momentumColumnName) < buyThreshold;
             
-            buySellSignal(buyIndices) = "Buy";
+            buySellSignal(buyIndices) = 1;
+            buySellSignal(sellIndices) = 0;
             
-            % Determine the new columnName
             newColumnName = momentumColumnName + "BuySellSignal";
 
             stockData.(newColumnName) = buySellSignal;
@@ -170,19 +173,21 @@ classdef TradingStrategies
         function [stockData, newColumnName] = addRSIBuySellSignal(stockData, RSIColumnName, buyThreshold)
             
             % Initialize the BuySellSignal column with "Sell" by default
-            buySellSignal = repmat("Sell", height(stockData), 1);
+            buySellSignal = NaN(height(stockData), 1);
 
-            % Find the indices where the momentum value meets or exceeds the buyThreshold
+            % Find the indices where the RSI value meets or exceeds the buyThreshold
             buyIndices = stockData.(RSIColumnName) >= buyThreshold;
 
-            buySellSignal(buyIndices) = "Buy";
+            % Find the indices where the RSI value falls below the buyThreshold
+            sellIndices = stockData.(RSIColumnName) < buyThreshold;
 
-            % Determine the new column name
+            buySellSignal(buyIndices) = 1;
+            buySellSignal(sellIndices) = 0;
+
             newColumnName = RSIColumnName + "BuySellSignal";
 
             stockData.(newColumnName) = buySellSignal;
         
         end
-        
     end
 end
