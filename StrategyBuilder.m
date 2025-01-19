@@ -97,7 +97,7 @@ classdef StrategyBuilder
                 elseif contains(lowerColumnNameStr, 'bollinger')
                     strategyMap(columnNameStr) = 'Bollinger';
 
-                elseif contains(lowerColumnNameStrm, 'movingaverage')
+                elseif contains(lowerColumnNameStr, 'movingaverage')
                     strategyMap(columnNameStr) = 'MovingAverage';
                 
                 else
