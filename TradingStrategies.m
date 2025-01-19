@@ -1,5 +1,7 @@
-classdef Strategies
+classdef TradingStrategies
     % Contains all the methods to add each individual prediction strategy to an input dataset
+    % These methods are common strategies that already exist; the functions within this class
+    % are called to add these strategies, with different parameters and tuning, to an input data table
     
     methods(Static)
 
