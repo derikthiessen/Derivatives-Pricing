@@ -6,7 +6,7 @@ classdef StrategyBuilder
 
     methods(Static)
 
-        function stockData = buildCombinedStrategy(stockData, priceColumn, strategyConditions, logicalOperator, outputColumnTitle)
+        function [stockData, outputColumnTitle] = buildCombinedStrategy(stockData, priceColumn, strategyConditions, logicalOperator, outputColumnTitle)
     
             if ~ismember(logicalOperator, ["and", "or"])
                 error('Input for logicalOperator must be "and" or "or".');
