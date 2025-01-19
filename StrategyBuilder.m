@@ -31,7 +31,7 @@ classdef StrategyBuilder
                     switch strategyMap(columnNameStr)
                         case 'MovingAverage'
                             if isnumeric(conditionValue)
-                                conditionResults(:, colIndex) = abs(stockData.(columnNameStr) - stockData.(priceColumn)) / stockData.(priceColumn) >= conditionValue;
+                                conditionResults(:, colIndex) = abs(stockData.(columnNameStr) - stockData.(priceColumn)) ./ stockData.(priceColumn) >= conditionValue;
                             elseif ismember(conditionValue, {'over', 'under'})
                                 if conditionValue == "over"
                                     conditionResults(:, colIndex) = stockData.(columnNameStr) > stockData.(priceColumn);
@@ -44,9 +44,8 @@ classdef StrategyBuilder
                         case 'Momentum'
                             conditionResults(:, colIndex) = stockData.(columnNameStr) >= conditionValue;
                         case 'Bollinger'
-                            % Similar logic to MovingAverage
                             if isnumeric(conditionValue)
-                                conditionResults(:, colIndex) = abs(stockData.(columnNameStr) - stockData.(priceColumn)) / stockData.(priceColumn) >= conditionValue;
+                                conditionResults(:, colIndex) = abs(stockData.(columnNameStr) - stockData.(priceColumn)) ./ stockData.(priceColumn) >= conditionValue;
                             elseif ismember(conditionValue, {'over', 'under'})
                                 if conditionValue == "over"
                                     conditionResults(:, colIndex) = stockData.(columnNameStr) > stockData.(priceColumn);
