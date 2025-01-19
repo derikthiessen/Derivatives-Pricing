@@ -108,8 +108,8 @@ classdef Strategies
             end
             
             % Add the new columns to the table
-            upperBandColumnName = sprintf('BollingerUpperBand%dSMA_Periods', smaPeriods);
-            lowerBandColumnName = sprintf('BollingerLowerBand%dSMA_Periods', smaPeriods);
+            upperBandColumnName = sprintf('BollingerUpperBand%dSMAPeriods', smaPeriods);
+            lowerBandColumnName = sprintf('BollingerLowerBand%dSMAPeriods', smaPeriods);
             
             stockData.(upperBandColumnName) = upperBand;
             stockData.(lowerBandColumnName) = lowerBand;
