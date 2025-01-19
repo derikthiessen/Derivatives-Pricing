@@ -24,12 +24,33 @@ classdef Plotting
 
             hold off
             
-            % Add labels, title, and legend
             xlabel(xColumnName)
             ylabel('Price')
             title(chartTitle)
-            legend show % Display the legend
+            legend show 
             grid on
+        end
+
+        function plotHitRateBarChart(stockData, buyColumnName, priceValidationColumnName, chartTitle)
+            
+            closePrice = stockData.Close;
+            
+            buyColumn = stockData.(buyColumnName);
+            priceValidationColumn = stockData.(priceValidationColumnName);
+            
+            hits = (buyColumn == 1) & (priceValidationColumn > closePrice);
+            totalValidBuys = sum(~isnan(buyColumn));
+            
+            hitRate = sum(hits) / totalValidBuys;
+
+            figure;
+            bar(hitRate);
+            title(chartTitle);
+            ylabel('Hit Rate');
+            xticklabels({buyColumnName});
+            ylim([0 1]);
+            grid on;
+
         end
     end
 end
